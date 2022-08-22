@@ -1,0 +1,2 @@
+﻿D:\vs2022\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(534,5): warning MSB8028: The intermediate directory (D:\VS2022gameproject\GameGLWFopengl\source\example_glfw_opengl3\Debug\) contains files shared from another project (example_glfw_opengl3.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  FINAL.vcxproj -> D:\VS2022gameproject\GameGLWFopengl\source\example_glfw_opengl3\Debug\c++game.exe

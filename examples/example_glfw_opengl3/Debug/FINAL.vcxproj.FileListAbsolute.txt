@@ -1,3 +1,0 @@
-D:\imgui-docking\examples\example_glfw_opengl3\Debug\c++game.exe
-D:\VS2022gameproject\examples\example_glfw_opengl3\Debug\c++game.exe
-D:\VS2022gameproject\GameGLWFopengl\examples\example_glfw_opengl3\Debug\c++game.exe
