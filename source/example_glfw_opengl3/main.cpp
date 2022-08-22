@@ -20,7 +20,8 @@ using namespace std;
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-
+double tracker = glfwGetTime();
+const float frameCap = 1 / 60.0f;
 
 
 
@@ -64,12 +65,7 @@ int main(int, char**)
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
-
-
-
-
-
-    glfwSwapInterval(1); // Enable vsync
+    glfwSwapInterval(1); // Enable uncapped (we will base render, phy, event engine on our own tick rate
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -143,12 +139,9 @@ int main(int, char**)
     GLint windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
-
-
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    
     while (!glfwWindowShouldClose(window))
     {
         // Poll and handle events (inputs, window resize, etc.)
@@ -158,7 +151,8 @@ int main(int, char**)
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
 
-
+        display(window, f_gui, playerz, playerx, playery, playerrotx, playerroty, playerrotz, mouseaccx, mouseaccy);
+        glfwSwapBuffers(window);
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -177,7 +171,7 @@ int main(int, char**)
 
             ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+            ImGui::Checkbox("focus on game", &show_another_window);
 
             ImGui::SliderFloat("float", &f_gui, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
             ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
@@ -194,11 +188,11 @@ int main(int, char**)
         // 3. Show another simple window.
         if (show_another_window)
         {
-            ImGui::Begin("Another Window in render loop (popup enabled)", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
+            ImGui::Begin("Window in render loop (popup enabled)", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Text("window in focus");
 
 
-            
+
             /// <summary>
             ///  sim grav by incrementf() <->"player.h" each tick 
             /// </summary>
@@ -214,7 +208,7 @@ int main(int, char**)
                 }
 
                 glfwGetCursorPos(window, &mousex, &mousey);
-                glfwSetCursorPos(window, windowWidth/2, windowHeight/2); // min x and min y
+                glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2); // min x and min y
 
                 bool a = signbit(mouseaccx);
                 bool b = signbit(mouseaccy);
@@ -235,16 +229,16 @@ int main(int, char**)
 
 
 
-                
+
                 if (b == 0) {
-                        if ((windowHeight / 2 - mousey) > 0) {
-                            cout << "posnegacc" << mouseaccy << endl;
-                            mouseaccy -= .5 * (windowHeight / 2 - mousey);
-                        }
-                        else if ((windowHeight / 2 - mousey) < 0) {
-                            cout << "negnegacc" << mouseaccy << endl;
-                            mouseaccy -= .5 * (windowHeight / 2 - mousey);
-                        
+                    if ((windowHeight / 2 - mousey) > 0) {
+                        cout << "posnegacc" << mouseaccy << endl;
+                        mouseaccy -= .5 * (windowHeight / 2 - mousey);
+                    }
+                    else if ((windowHeight / 2 - mousey) < 0) {
+                        cout << "negnegacc" << mouseaccy << endl;
+                        mouseaccy -= .5 * (windowHeight / 2 - mousey);
+
                     }
                 }
                 else if (mouseaccy < -90) {
@@ -252,11 +246,11 @@ int main(int, char**)
                 }
 
                 if (mouseaccy > 450) {
-                     mouseaccy = 449.9;
+                    mouseaccy = 449.9;
                 }
-                if (mouseaccy < 269.9){
+                if (mouseaccy < 269.9) {
                     mouseaccy = 270;
-                    
+
                 }
 
                 if (b == 1) {
@@ -268,7 +262,7 @@ int main(int, char**)
 
 
 
-                
+
                 //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             }
 
@@ -277,7 +271,7 @@ int main(int, char**)
             if (playery < 0.0f) {
                 incrementf(playeryy, .3f);
             }
-            
+
             display(window, f_gui, playerz, playerx, playery, playerrotx, playerroty, playerrotz, mouseaccx, mouseaccy);
             processInput(window, playerzz, playerxx, playeryy, togglemouse);
 
@@ -286,6 +280,9 @@ int main(int, char**)
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
             ImGui::End();
+        }
+        else {
+            glfwSwapBuffers(window);
         }
 
         // Rendering
@@ -309,9 +306,12 @@ int main(int, char**)
             glfwMakeContextCurrent(backup_current_context);
         }
 
-        glfwSwapBuffers(window);
+
     }
 
+
+    
+    
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

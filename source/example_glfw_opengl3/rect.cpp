@@ -87,8 +87,8 @@ void display(GLFWwindow* window, float floater, float playerz, float playerx, fl
 
 
     drawRect();
-    glfwSwapBuffers(window);
 
     // Update Screen
+   
 
 }
