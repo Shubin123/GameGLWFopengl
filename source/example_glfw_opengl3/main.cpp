@@ -5,10 +5,12 @@
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
-#include "rect.h"
-#include "player.h"
 
+#include <GLFW/glfw3.h> // Will drag system OpenGL headers
+
+#include "player.h"
+#include "controller.h"
+#include "rect.h"
 
 #include "iostream"
 using namespace std;
@@ -114,6 +116,7 @@ int main(int, char**)
     bool show_another_window = false;
     static float f_gui = 0.0f;
 
+
     float playerz = 0.0f;
     float* playerzz = &playerz;
     float playerx = 0.0f;
@@ -131,17 +134,24 @@ int main(int, char**)
     double mousex = 0;
     double mousey = 0;
     double mouseaccx = 0;
+    double* mouseaccxx = &mouseaccx;
     double mouseaccy = 0;
+    double* mouseaccyy = &mouseaccy;
+
     bool mousetoggle = false;
     bool *togglemouse = &mousetoggle;
     bool first_time = true;
 
+
     GLint windowWidth, windowHeight;
+
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    display(window, playerxx, playeryy, playerzz, playerrotxx, playerrotyy, playerrotzz, mousex, mousey);
 
     // Main loop
+
     while (!glfwWindowShouldClose(window))
     {
         // Poll and handle events (inputs, window resize, etc.)
@@ -149,10 +159,11 @@ int main(int, char**)
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-        glfwPollEvents();
 
-        display(window, f_gui, playerz, playerx, playery, playerrotx, playerroty, playerrotz, mouseaccx, mouseaccy);
+        glfwPollEvents();
+        //display(window);
         glfwSwapBuffers(window);
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -176,8 +187,8 @@ int main(int, char**)
             ImGui::SliderFloat("float", &f_gui, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
             ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
+            //if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+              //  counter++;
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
 
@@ -198,91 +209,27 @@ int main(int, char**)
             /// </summary>
 
             if (mousetoggle) {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
                 if (first_time) {
                     cout << "run once" << endl;
-                    glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
-                    mouseaccx = -180.5;
-                    mouseaccy = -358;
+                    // glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
+                    mouseaccx = 270;
+                    mouseaccy = 90;
                     first_time = false;
-                }
-
-                glfwGetCursorPos(window, &mousex, &mousey);
-                glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2); // min x and min y
-
-                bool a = signbit(mouseaccx);
-                bool b = signbit(mouseaccy);
-                if (a == 0) {
-                    if ((windowWidth / 2 - mousex) < 0) {
-                        mouseaccx -= .5 * (windowWidth / 2 - mousex);
-                    }
-                    else if ((windowWidth / 2 - mousex) > 0) {
-                        mouseaccx -= .5 * (windowWidth / 2 - mousex);
-                    }
-                }
-                if (a == 1 || mouseaccx == 360) {
-                    cout << "turn l" << mouseaccx << a << endl;
-
-                    mouseaccx = 180;
-                    playerroty += 180;
-                }
-
-
-
-
-                if (b == 0) {
-                    if ((windowHeight / 2 - mousey) > 0) {
-                        cout << "posnegacc" << mouseaccy << endl;
-                        mouseaccy -= .5 * (windowHeight / 2 - mousey);
-                    }
-                    else if ((windowHeight / 2 - mousey) < 0) {
-                        cout << "negnegacc" << mouseaccy << endl;
-                        mouseaccy -= .5 * (windowHeight / 2 - mousey);
-
-                    }
-                }
-                else if (mouseaccy < -90) {
-                    mouseaccy = 270;
-                }
-
-                if (mouseaccy > 450) {
-                    mouseaccy = 449.9;
-                }
-                if (mouseaccy < 269.9) {
-                    mouseaccy = 270;
 
                 }
+                display(window, playerxx, playeryy, playerzz, playerrotxx, playerrotyy, playerrotzz, mousex, mousey);
 
-                if (b == 1) {
-                    mouseaccy = 360;
+                if (playery < 0.0f) {
+                    incrementf(playeryy, f_gui);
                 }
-
-
-                cout << mouseaccx << ":" << mouseaccy << endl;
-
-
-
-
-                //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             }
 
 
-
-            if (playery < 0.0f) {
-                incrementf(playeryy, .3f);
-            }
-
-            display(window, f_gui, playerz, playerx, playery, playerrotx, playerroty, playerrotz, mouseaccx, mouseaccy);
-            processInput(window, playerzz, playerxx, playeryy, togglemouse);
-
-
+            processInput(window, playerxx, playeryy, playerzz, togglemouse);
 
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
             ImGui::End();
-        }
-        else {
-            glfwSwapBuffers(window);
         }
 
         // Rendering
@@ -305,18 +252,11 @@ int main(int, char**)
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
-
-
-    }
-
-
-    
-    
+    }    
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
     glfwDestroyWindow(window);
     glfwTerminate();
 

@@ -1,13 +1,15 @@
 #include "rect.h"
 #include "math.h"
+#include "controller.h"
 
 #include "iostream"
 using namespace std;
 
+const GLdouble pi = 3.1415926535897932384626433832795;
+
 
 void perspectiveGL(GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
-    const GLdouble pi = 3.1415926535897932384626433832795;
     GLdouble fW, fH;
 
     //fH = tan( (fovY / 2) / 180 * pi ) * zNear;
@@ -57,15 +59,8 @@ void drawRect() {
     alpha += 1;
 }
 
-void translate(float playerx, float playery, float playerz) {
-    glTranslatef(0 + playerx, playery, -5 + playerz);
-}
-void rotate(float playerrotx, float playerroty, float playerrotz, double mousex, double mousey) {
-    glRotated(mousex, playerrotx, playerroty, playerrotz);
-    glRotatef(mousex, playerrotx, playerroty + mousex, playerrotz);
-    glRotatef(mousey, playerrotx + mousey, playerroty, playerrotz);
-}
-void display(GLFWwindow* window, float floater, float playerz, float playerx, float playery, float playerrotx, float playerroty, float playerrotz, double mousex, double mousey) {
+
+void display(GLFWwindow* window, float* playerxx, float* playeryy, float* playerzz, float* playerrotxx, float* playerrotyy, float* playerrotzz, double  mousex, double mousey) {
     
     // Scale to window size
     GLint windowWidth, windowHeight;
@@ -79,16 +74,18 @@ void display(GLFWwindow* window, float floater, float playerz, float playerx, fl
     glMatrixMode(GL_PROJECTION_MATRIX);
     glLoadIdentity();
     perspectiveGL(60, (double)windowWidth / (double)windowHeight, 0.1, 100);
-
     glMatrixMode(GL_MODELVIEW_MATRIX);
-    
-    rotate(playerrotx, playerroty, playerrotz, mousex, mousey);
-    translate(playerx, playery, playerz);
 
 
-    drawRect();
 
     // Update Screen
+
+    cameraController(window, playerxx, playeryy, playerzz, playerrotxx, playerrotyy, playerrotzz, mousex, mousey);
+
+    drawRect();
+    glfwSwapBuffers(window);
+
+   
    
 
 }

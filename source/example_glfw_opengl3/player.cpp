@@ -30,24 +30,33 @@ void decrementf(float* f, float factor = 1) {
     *f -= .1f * factor;
 }
 void toggleB(GLFWwindow* window, bool* b, duration<double> tsecs) {
-    GLint windowWidth, windowHeight;
-    glfwGetWindowSize(window, &windowWidth, &windowHeight);
-    glfwSetCursorPos(window, windowWidth/2, windowHeight/2); // min x and min y
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
 
     sleep_for(10ns);
     sleep_until(system_clock::now() + tsecs);
+    GLint windowWidth, windowHeight;
         if (*b) {
+
+            GLint windowWidth, windowHeight;
+            glfwGetWindowSize(window, &windowWidth, &windowHeight);
+            glfwSetCursorPos(window, windowWidth/2, windowHeight/2); // min x and min y
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+
             *b = 0;
         }
         else {
+            glfwGetWindowSize(window, &windowWidth, &windowHeight);
+            glfwSetCursorPos(window, windowWidth/2, windowHeight/2); // min x and min y
+            //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
             *b = 1;
         }
 }
 
 
 
-void processInput(GLFWwindow* window, float* z, float* x, float* y, bool* togglemouse) {
+void processInput(GLFWwindow* window, float* x, float* y, float* z, bool* togglemouse) {
 
     // keyboard
     if (glfwGetKey(window, GLFW_KEY_W)) {

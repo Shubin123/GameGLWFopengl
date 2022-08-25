@@ -11,5 +11,5 @@
 
    
 void drawRect();
-void display(GLFWwindow* window, float floater, float playerz, float playerx, float playery, float playerrotx, float playerroty, float playerrotz, double mousex, double mousey);
+void display(GLFWwindow* window, float* playerxx, float* playeryy, float* playerzz, float* playerrotxx, float* playerrotyy, float* playerrotzz, double  mousex, double mousey);
 
